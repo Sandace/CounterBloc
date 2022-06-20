@@ -1,4 +1,4 @@
-import 'package:bloc_implemented_demo/bloc/bloc/counter_bloc.dart';
+import 'package:bloc_implemented_demo/bloc/counter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,9 +14,10 @@ class MyApp extends StatelessWidget {
     return BlocProvider<CounterBloc>(
       create: (_) => CounterBloc(),
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primarySwatch: Colors.green,
         ),
         home: const MyHomePage(title: 'Counter  Bloc'),
       ),
@@ -34,6 +35,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  // Timer? timer;
+  // @override
+  // void initState() {
+  //   super.initState();
+  // }
+
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,58 +61,114 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             BlocConsumer<CounterBloc, CounterState>(
               listener: (context, state) {
-                final snackBar = SnackBar(
-                  content: Text('Incremented'),
-                  duration: Duration(microseconds: 300),
-                );
-                final snackBar2 = const SnackBar(
-                  content: Text('Decremented'),
-                  duration: Duration(microseconds: 300),
-                );
+                // const snackBar = SnackBar(
+                //   content: Text('Incremented'),
+                //   duration: Duration(microseconds: 300),
+                // );
+                // const snackBar2 = SnackBar(
+                //   content: Text('Decremented'),
+                //   duration: Duration(microseconds: 300),
+                // );
 
-                if (state.wasIncremented == true) {
-                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                }
-                if (state.wasIncremented == false) {
-                  ScaffoldMessenger.of(context).showSnackBar(snackBar2);
-                }
+                // state.map(
+                //     initial: (s) {},
+                //     increment: (s) {
+                //       ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                //     },
+                //     decrement: (s) {
+                //       ScaffoldMessenger.of(context).showSnackBar(snackBar2);
+                //     });
               },
               builder: (context, state) {
-                if (state.counterValue > 0) {
-                  return Text(
-                    'Positive ' + state.counterValue.toString(),
-                    style: Theme.of(context).textTheme.headline4,
-                  );
-                }
-                if (state.counterValue < 0) {
-                  return Text(
-                    'Negative ' + state.counterValue.toString(),
-                    style: Theme.of(context).textTheme.headline4,
-                  );
-                }
-                return Text(state.counterValue.toString(),
+                return Text(
+                    state.map(
+                        initial: (s) => s.currentValue.toString(),
+                        increment: (s) => s.currentValue.toString(),
+                        decrement: (s) => s.currentValue.toString()),
                     style: Theme.of(context).textTheme.headline4);
               },
             ),
           ],
         ),
       ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          FloatingActionButton(
-            onPressed: () {
-              context.read<CounterBloc>().add(IncrementCounter());
-            },
-            tooltip: 'Increment',
-            child: const Icon(Icons.add),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  context
+                      .read<CounterBloc>()
+                      .add(const CounterEvent.increment(incrementAmount: 5));
+                },
+                child: const Text(
+                  '+5',
+                  style: TextStyle(fontSize: 25),
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () {
+                  BlocProvider.of<CounterBloc>(context)
+                      .add(const CounterEvent.increment(incrementAmount: 1));
+                },
+                child: const Text(
+                  "+1",
+                  style: TextStyle(fontSize: 25),
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () {
+                  BlocProvider.of<CounterBloc>(context)
+                      .add(const CounterEvent.decrement(decrementAmount: 1));
+                },
+                child: const Text(
+                  "-1",
+                  style: TextStyle(fontSize: 25),
+                ),
+              ),
+            ],
           ),
-          FloatingActionButton(
-            onPressed: () {
-              BlocProvider.of<CounterBloc>(context).add(DecrementCounter());
-            },
-            tooltip: 'Decrement',
-            child: const Icon(Icons.remove),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    context
+                        .read<CounterBloc>()
+                        .add(const CounterEvent.decrement(decrementAmount: 10));
+                  });
+                },
+                child: const Text(
+                  "-10",
+                  style: TextStyle(fontSize: 25),
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () {
+                  BlocProvider.of<CounterBloc>(context)
+                      .add(const CounterEvent.decrement(decrementAmount: 2));
+                },
+                child: const Text(
+                  "-2",
+                  style: TextStyle(fontSize: 25),
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () {
+                  // timer!.cancel();
+                  BlocProvider.of<CounterBloc>(context)
+                      .add(const CounterEvent.resetPressed());
+                },
+                child: const Icon(Icons.restart_alt),
+              ),
+            ],
           ),
         ],
       ),
